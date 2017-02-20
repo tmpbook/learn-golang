@@ -24,6 +24,7 @@ func main() {
 }
 
 func lissajous(out io.Writer) {
+	// const 很清楚，不可变的对象
 	const (
 		cycles  = 5
 		res     = 0.001
@@ -32,6 +33,7 @@ func lissajous(out io.Writer) {
 		delay   = 8
 	)
 	freq := rand.Float64() * 3.0
+	// 这里是结构体类似 JS 里面的 Object，key不用加引号
 	anim := gif.GIF{LoopCount: nframes}
 	phase := 0.0
 	for i := 0; i < nframes; i++ {
