@@ -60,3 +60,54 @@ f, err := os.Create(outfile)
 
 // 当然，这些是在同级词法域的基础上
 ```
+
+#### 2.3.2. 指针
+> 一个指针的值是另一个变量的地址。一个指针对应变量在内存中的存储位置。并不是每一个值都会有一个内存地址，但是对于每一个变量必然有对应的内存地址。通过指针，我们可以直接读或者更新对应变量的值，而不需要知道该变量的名字（如果变量有名字的话）。
+```golang
+var x int
+// &x 将产生一个指向该整数变量的指针，指针对应的数据类型是 *int
+// 被称为『指向 int 类型的指针』
+
+// 如果指针名字为 p，那么可以说『 p 指针指向变量 x 』，或者
+// 『p 指针保存了 x 变量的内存地址』
+
+// *p 表达式对应 p 指针指向的变量的值
+
+// 例子：
+x := 1
+p := &x         // p, of type *int, points to x
+fmt.Println(*p) // "1"
+*p = 2          // equivalent to x = 2
+fmt.Println(x)  // "2"
+```
+
+> 任何指针的零值都是 nil。如果 p 指向某个有效变量，那么 p != nil 测试为真。指针之间也可以进行测试的，只有当它们指向的同一个变量或全部是 nil 时才相等。
+
+```golang
+var x, y int
+fmt.Println(&x == &x, &x == &y, &x == nil) // "true false false"
+```
+
+> 在 go 语言中，返回函数中局部变量的地址也是安全的，调用 f 函数时创建局部变量 v，在局部变量地址被返回之后依然有效，因为指针 p 依然引用这个变量。
+```golang
+var p = f()
+
+func f() *int {
+    v := 1
+    return &v
+}
+// 每次调用 f 函数都将返回不同的结果：
+fmt.Println(f() == f()) // "false"
+```
+
+> 通过指针更新变量值（模拟 ++i )
+```golang
+func incr(p *int) int {
+    *p++
+    return *p
+}
+
+v := 1
+incr(&v)              // side effect: v is now 2
+fmt.Println(incr(&v)) // "3" (and v is 3)
+```
