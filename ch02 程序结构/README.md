@@ -230,3 +230,29 @@ v = <-ch        // 管道接收，失败是返回零值（阻塞不算失败）
 _, ok = m[key]  // 丢弃字节数
 _, ok = x.(T)   // 只检测类型，忽略具体值
 ```
+#### 2.4.2 可赋值性
+> 赋值语句是显示的赋值形式，但是程序中还有很多地方会发生隐式的赋值行为：函数调用会隐式的将调用的参数的值赋给函数的参数变量，一个返回语句会隐式的将返回操作的值赋值给结果变量，一个符合类型的字面量也会产生赋值行为。例如：
+
+```golang
+medals := []string{"gold", "silver", "bronze"}
+// 类似
+medals[0] = "gold"
+medals[1] = "silver"
+medals[2] = "bronze"
+```
+规则：类型必须完全匹配，`nil` 可以赋值给任何指针或引用类型的变量
+
+值得注意的是，对于两个值是否可以用`==`或`!=`进行比相等比较的能力也和可赋值能力有关系：对于任何类型的值的相等比较，第二个值必须是对第一个值类型对应的变量是可赋值的，反之亦然。
+
+### 2.5 类型
+```golang
+gopl.io/ch2/tempconv0
+
+// Package tempconv performs Celsius and Fahrenheit temperature computations. package tempconv
+
+import "fmt" type Celsius float64 // 摄氏温度 type Fahrenheit float64 // 华氏温度
+
+const ( AbsoluteZeroC Celsius = -273.15 // 绝对零度 FreezingC Celsius = 0 // 结冰点温度 BoilingC Celsius = 100 // 沸水温度 )
+
+func CToF(c Celsius) Fahrenheit { return Fahrenheit(c*9/5 + 32) } func FToC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9) }
+```
