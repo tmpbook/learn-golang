@@ -250,9 +250,75 @@ gopl.io/ch2/tempconv0
 
 // Package tempconv performs Celsius and Fahrenheit temperature computations. package tempconv
 
-import "fmt" type Celsius float64 // 摄氏温度 type Fahrenheit float64 // 华氏温度
+import "fmt" 
 
-const ( AbsoluteZeroC Celsius = -273.15 // 绝对零度 FreezingC Celsius = 0 // 结冰点温度 BoilingC Celsius = 100 // 沸水温度 )
+type Celsius float64 // 摄氏温度 
+type Fahrenheit float64 // 华氏温度
 
-func CToF(c Celsius) Fahrenheit { return Fahrenheit(c*9/5 + 32) } func FToC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9) }
+const ( 
+    AbsoluteZeroC Celsius = -273.15 // 绝对零度 
+    FreezingC Celsius = 0 // 结冰点温度 
+    BoilingC Celsius = 100 // 沸水温度 
+)
+
+func CToF(c Celsius) Fahrenheit { return Fahrenheit(c*9/5 + 32) } 
+func FToC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9) }
+```
+
+比较运算符`==`和`<`也可以用来比较一个命名类型的变量和另一个有相同类型的变量，或有着相同底层类型的未命名类型的值之间做比较。但是如果两个值有不同的类型，则不能直接进行比较：
+```golang
+var c Celsius
+var f Fahrenheit
+fmt.Println(c == 0)         // "true"
+fmt.Println(f >= 0)         // "true"
+fmt.Println(c == f)         // compile error: type mismatch
+fmt.Println(c == Celsius(f))// "true"
+// Celsius(f)是类型转换操作，并不会改变值，仅仅是改变值的类型而已
+```
+
+```golang
+func (c Celsius) String() string { return fmt.Sprintf("%g℃", c) }
+// 许多类型都会定义一个String方法，因为当使用fmt包的打印方法时，将会优先使用该类型对应的String方法返回的结果打印（作者注，这里和 Python 一样，类型有内置函数，可以重写）
+```
+
+```golang
+c := FToC(212.0)
+fmt.Println(c.String()) // "100℃"
+fmt.Printf("%v\n", c)   // "100℃"; no need to call String explicitly
+fmt.Printf("%s\n", c)   // "100℃"
+fmt.Println(c)          // "100℃"
+fmt.Printf("%g\n", c)   // "100"; does not call String
+fmt.Printf(float64(c))  // "100"; does not call String
+```
+
+### 2.6 包和文件
+
+每个包都对应一个独立的名字空间。例如：在image包中的Decode函数和在unicode/utf16包中的Decode函数时不同的，要在外部引用该函数，必须显式的使用image.Decode或utf16.Decode形式访问。
+
+在Go语言中，一个简单的规则是：如果一个名字是大写字母开头的，那么该名字是导出的。
+
+```golang
+package main
+
+import (
+    "fmt"
+    "os"
+    "strconv"
+
+    "gopl.io/ch2/tempconv"
+)
+
+func main() {
+    for _, arg := range os.Args[1:] {
+        t, err := strconv.ParseFloat(arg, 64)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "cf: %v\n", err)
+            os.Exit(1)
+        }
+        f := tempconv.Fahrenheit(t)
+        c := tempconv.Celsius(t)
+        fmt.Printf("%s = %s, %s = %s\n",
+            f, tempvonc.FToC(f), c, tempconv.CToF(c))
+    }
+}
 ```
