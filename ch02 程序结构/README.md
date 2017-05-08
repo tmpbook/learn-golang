@@ -352,3 +352,81 @@ func init() { /* ... */}
 // 生成辅助表格 pc，pc 表格用于处理每个 8bit 宽度的数字含二进制的 1bit 的 bit 个数，这样的话在处理
 // 64bit 宽度的数字时就没有必要循环 64 此， 只需要8次查表就可以了。
 ```
+
+#### 作用域
+```golang
+func main() {
+    x := "hello!"
+    for i := 0; i < len(x); i++ {
+        x := x[i]
+        if x != [!] {
+            x := x + 'A' - 'a'
+            fmt.Printf("%c", x) // "HELLO" (one letter per iteration)
+        }
+    }
+}
+
+func main() {
+    x := "hello"
+    for _, x := range x {
+        x := x + 'A' - 'a'
+        fmt.Printf("%c", x)
+    }
+}
+
+if x := f(); x == 0 {
+    fmt.Println(x)
+} else if y := g(x); x == y {
+    fmt.Println(x, y)
+} else {
+    fmt.Println(x, y)
+}
+fmt.Println(x, y) // compile error: x and y are not visible here
+```
+> 第二个if语句嵌套在第一个内部，因此第一个if语句条件初始化词法域声明的变量在第二个if中也可以访问。switch语句的每个分支也有类似的语法域规则：条件部分为一个隐式语法域，然后每个是每个分支的语法域。
+
+在看一个例子：
+
+在这个程序中
+```golang
+if f, err := os.Open(fname); err != nil { // compile error: unused: f
+    return err
+}
+f.ReadByte() // compile error: undefined f
+f.Close()    // compile error: undefined f
+```
+变量f的作用域只有if语句内，因此后面的语句将无法引入它，这将导致编译错误。你可能会收到一个局部变量f没有生命的错误提示，具体错误信息依赖编译器的实现。
+
+通常需要再if之前声明变量，这样可以确保后面的语句依然可以访问变量：
+```golang
+f, err := os.Open(fname)
+if err != nil {
+    return err
+}
+f.ReadByte()
+f.Close()
+```
+
+你可能会考虑通过将`ReadByte`和`Close`移动到if的else块来解决这个问题：
+```golang
+if f, err := os.Open(fname); err != nil {
+    return err
+} else {
+    // f and err are visible here too
+    f.ReadByte()
+    f.Close()
+}
+```
+!!!但这不是Go语言推荐的做法，Go语言的习惯是在if中处理错误然后直接返回，这样可以确保正常执行的语句不需要代码缩进（这让我想到了JavaScript中的promise）
+
+有许多方式可以避免出现类似潜在的问题。最直接的方法是通过单独声明err变量，来避免使用`:=`的简短声明方式
+```golang
+var cwd string
+func init() {
+    var err error
+    cwd, err = os.Getwd()
+    if err != nil {
+        log.Fatalf("os.Getwd failed: %v", err)
+    }
+}
+```
