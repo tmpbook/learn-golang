@@ -6,9 +6,9 @@ import (
 	"os/exec"
 )
 
-// func runSomeShell(args ...string) {
-func runSomeShell(args []string) {
-	cmd := exec.Command("sh", args...)
+func runSomeShell(name string, args ...string) {
+	// func runSomeShell(name string, args []string) {
+	cmd := exec.Command(name, args...)
 	var out, err bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &err
@@ -21,6 +21,17 @@ func runSomeShell(args []string) {
 }
 
 func main() {
-	// runSomeShell("./echo.sh", "1", "2", "3")
-	runSomeShell([]string{"./echo.sh", "1", "2", "3"})
+	runSomeShell("ansible", "jumpserver", "-m ping", "-u root")
+	runSomeShell("sh", "./echo.sh", "a", "b", "c")
+	// runSomeShell("sh", []string{"./echo.sh", "a", "b", "c"})
 }
+
+// go run main.go
+// ----
+// 107.*.*.33 | SUCCESS => {
+//     "changed": false,
+//     "ping": "pong"
+// }
+// 第一个参数为: a 参数个数为: 3
+// 第一个参数为: b 参数个数为: 2
+// 第一个参数为: c 参数个数为: 1
