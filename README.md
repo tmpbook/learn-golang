@@ -1,1 +1,3 @@
-# learn-golang-in-30days
+## learn-golang
+
+code snippet
