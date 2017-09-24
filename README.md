@@ -8,4 +8,6 @@
 * [type](/type)
 * [context](/context)
 * [channel](/channels)
+* [go concurrency patterns](/Go-Concurrency-Patterns)
+* [go best practice](/go-best-practice)
 * ...
