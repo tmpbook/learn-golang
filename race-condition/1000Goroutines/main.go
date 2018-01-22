@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-// N 是内存里的一个数子
+// N 是内存里的一个对象
 var (
 	N         = 0
 	waitgroup sync.WaitGroup
